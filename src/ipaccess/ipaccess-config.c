@@ -528,7 +528,7 @@ static void bootstrap_om(struct gsm_bts_trx *trx)
 	int need_to_set_attr = 0;
 	int len;
 
-	printf("OML link established using TRX %d\n", trx->nr);
+	fprintf(get_attr ? stderr : stdout, "OML link established using TRX %d\n", trx->nr);
 
 	if (get_attr) {
 		msgb_put_u8(nmsg_get, NM_ATT_IPACC_PRIM_OML_CFG);
@@ -945,9 +945,6 @@ int main(int argc, char **argv)
 	osmo_init_logging2(tall_ctx_config, &log_info);
 	bts_model_nanobts_init();
 
-	printf("ipaccess-config (C) 2009-2010 by Harald Welte and others\n");
-	printf("This is FREE SOFTWARE with ABSOLUTELY NO WARRANTY\n\n");
-
 	while (1) {
 		int c;
 		unsigned long ul;
@@ -1067,6 +1064,9 @@ int main(int argc, char **argv)
 		}
 	};
 
+	fprintf(get_attr ? stderr : stdout, "ipaccess-config (C) 2009-2010 by Harald Welte and others\n");
+	fprintf(get_attr ? stderr : stdout, "This is FREE SOFTWARE with ABSOLUTELY NO WARRANTY\n\n");
+
 	if (firmware_analysis) {
 		analyze_firmware(firmware_analysis);
 		if (argc == optind) /* Nothing more to do, exit successfully */
@@ -1097,7 +1097,7 @@ int main(int argc, char **argv)
 
 	ipac_nwl_init();
 
-	printf("Trying to connect to ip.access BTS %s...\n", bts_ip);
+	fprintf(get_attr ? stderr : stdout, "Trying to connect to ip.access BTS %s...\n", bts_ip);
 
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
