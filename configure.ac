@@ -44,15 +44,25 @@ AC_ARG_ENABLE([ipaccess-utils], [AS_HELP_STRING([--enable-ipaccess-utils], [Buil
 AM_CONDITIONAL(BUILD_IPA_UTILS, test "x$osmo_ac_ipa_utils" = "xyes")
 AC_SUBST(osmo_ac_ipa_utils)
 
+# Enable/disable osmo-bsc build?
+AC_ARG_ENABLE([osmo-bsc], [AS_HELP_STRING([--enable-osmo-bsc], [Build osmo-bsc])],
+    [build_osmo_bsc="$enableval"],[build_osmo_bsc="yes"])
+AM_CONDITIONAL(BUILD_OSMO_BSC, test "x$build_osmo_bsc" = "xyes")
+AC_SUBST(build_osmo_bsc)
+
 PKG_CHECK_MODULES(LIBOSMOCORE, libosmocore >= 0.12.0)
 PKG_CHECK_MODULES(LIBOSMOVTY, libosmovty >= 0.12.0)
 PKG_CHECK_MODULES(LIBOSMOCTRL, libosmoctrl >= 0.12.0)
 PKG_CHECK_MODULES(LIBOSMOGSM, libosmogsm >= 0.12.0)
 PKG_CHECK_MODULES(LIBOSMOABIS, libosmoabis >= 0.5.1)
-PKG_CHECK_MODULES(LIBOSMONETIF, libosmo-netif >= 0.3.0)
-PKG_CHECK_MODULES(LIBOSMOSIGTRAN, libosmo-sigtran >= 0.10.0)
-PKG_CHECK_MODULES(LIBOSMOSCCP, libosmo-sccp >= 0.10.0)
-PKG_CHECK_MODULES(LIBOSMOMGCPCLIENT, libosmo-mgcp-client >= 1.4.0)
+
+
+if test "x$build_osmo_bsc" = "xyes" ; then
+	PKG_CHECK_MODULES(LIBOSMONETIF, libosmo-netif >= 0.3.0)
+	PKG_CHECK_MODULES(LIBOSMOSIGTRAN, libosmo-sigtran >= 0.10.0)
+	PKG_CHECK_MODULES(LIBOSMOSCCP, libosmo-sccp >= 0.10.0)
+	PKG_CHECK_MODULES(LIBOSMOMGCPCLIENT, libosmo-mgcp-client >= 1.4.0)
+fi
 
 dnl checks for header files
 AC_HEADER_STDC

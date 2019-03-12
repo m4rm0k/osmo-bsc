@@ -1,12 +1,17 @@
 SUBDIRS = \
+	abis \
+	nanobts_omlattr \
+	$(NULL)
+
+if BUILD_OSMO_BSC
+SUBDIRS += \
 	bsc \
 	codec_pref \
 	gsm0408 \
-	abis \
 	subscr \
-	nanobts_omlattr \
 	handover \
 	$(NULL)
+endif
 
 # The `:;' works around a Bash 3.2 bug when the output is not writeable.
 $(srcdir)/package.m4: $(top_srcdir)/configure.ac

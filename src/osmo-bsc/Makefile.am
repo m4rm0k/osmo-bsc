@@ -43,6 +43,8 @@ libbscbts_la_LIBADD = \
 	$(LIBOSMOABIS_LIBS) \
 	$(NULL)
 
+if BUILD_OSMO_BSC
+
 bin_PROGRAMS = \
 	osmo-bsc \
 	$(NULL)
@@ -132,3 +134,5 @@ osmo_bsc_LDADD = \
 	$(LIBOSMOSIGTRAN_LIBS) \
 	$(LIBOSMOMGCPCLIENT_LIBS) \
 	$(NULL)
+
+endif # BUILD_OSMO_BSC
