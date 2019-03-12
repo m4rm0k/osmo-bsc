@@ -25,10 +25,7 @@ abis_test_SOURCES = \
 	$(NULL)
 
 abis_test_LDADD = \
-	$(top_builddir)/src/osmo-bsc/abis_nm.o \
-	$(top_builddir)/src/osmo-bsc/gsm_data.o \
-	$(top_builddir)/src/osmo-bsc/gsm_timers.o \
-	$(top_builddir)/src/osmo-bsc/net_init.o \
+	$(top_builddir)/src/osmo-bsc/libbscbts.la \
 	$(LIBOSMOCORE_LIBS) \
 	$(LIBOSMOABIS_LIBS) \
 	$(LIBOSMOGSM_LIBS) \

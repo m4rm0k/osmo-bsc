@@ -33,16 +33,13 @@ bsc_test_SOURCES = \
 	$(NULL)
 
 bsc_test_LDADD = \
-	$(top_builddir)/src/osmo-bsc/abis_nm.o \
-	$(top_builddir)/src/osmo-bsc/arfcn_range_encode.o \
-	$(top_builddir)/src/osmo-bsc/osmo_bsc_filter.o \
-	$(top_builddir)/src/osmo-bsc/bsc_subscriber.o \
-	$(top_builddir)/src/osmo-bsc/gsm_data.o \
-	$(top_builddir)/src/osmo-bsc/gsm_timers.o \
-	$(top_builddir)/src/osmo-bsc/handover_cfg.o \
-	$(top_builddir)/src/osmo-bsc/handover_logic.o \
-	$(top_builddir)/src/osmo-bsc/neighbor_ident.o \
-	$(top_builddir)/src/osmo-bsc/net_init.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-arfcn_range_encode.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-osmo_bsc_filter.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-bsc_subscriber.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-handover_cfg.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-handover_logic.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-neighbor_ident.o \
+	$(top_builddir)/src/osmo-bsc/libbscbts.la \
 	$(LIBOSMOCORE_LIBS) \
 	$(LIBOSMOGSM_LIBS) \
 	$(LIBOSMOVTY_LIBS) \

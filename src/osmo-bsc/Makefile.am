@@ -13,16 +13,51 @@ AM_CFLAGS = \
 	$(LIBOSMONETIF_CFLAGS) \
 	$(COVERAGE_CFLAGS) \
 	$(LIBOSMOABIS_CFLAGS) \
-	$(LIBOSMOSIGTRAN_CFLAGS) \
-	$(LIBOSMOMGCPCLIENT_CFLAGS) \
 	$(NULL)
 
 AM_LDFLAGS = \
 	$(COVERAGE_LDFLAGS) \
 	$(NULL)
 
+noinst_LTLIBRARIES = \
+        libbscbts.la \
+        $(NULL)
+
+libbscbts_la_SOURCES = \
+	abis_nm.c \
+	bts_ipaccess_nanobts.c \
+	bts_ipaccess_nanobts_omlattr.c \
+	bts_siemens_bs11.c \
+	e1_config.c \
+	gsm_data.c \
+	gsm_timers.c \
+	net_init.c \
+	$(NULL)
+
+libbscbts_la_LIBADD = \
+	$(LIBOSMOCORE_LIBS) \
+	$(LIBOSMOGSM_LIBS) \
+	$(LIBOSMOVTY_LIBS) \
+	$(LIBOSMOCTRL_LIBS) \
+	$(COVERAGE_LDFLAGS) \
+	$(LIBOSMOABIS_LIBS) \
+	$(NULL)
+
 bin_PROGRAMS = \
 	osmo-bsc \
+	$(NULL)
+
+osmo_bsc_CFLAGS = \
+	-Wall \
+	$(LIBOSMOCORE_CFLAGS) \
+	$(LIBOSMOGSM_CFLAGS) \
+	$(LIBOSMOVTY_CFLAGS) \
+	$(LIBOSMOCTRL_CFLAGS) \
+	$(LIBOSMONETIF_CFLAGS) \
+	$(COVERAGE_CFLAGS) \
+	$(LIBOSMOABIS_CFLAGS) \
+	$(LIBOSMOSIGTRAN_CFLAGS) \
+	$(LIBOSMOMGCPCLIENT_CFLAGS) \
 	$(NULL)
 
 osmo_bsc_SOURCES = \
@@ -45,19 +80,13 @@ osmo_bsc_SOURCES = \
 	bsc_vty.c \
 	bts_ericsson_rbs2000.c \
 	bts_init.c \
-	bts_ipaccess_nanobts.c \
-	bts_ipaccess_nanobts_omlattr.c \
 	bts_nokia_site.c \
-	bts_siemens_bs11.c \
 	bts_sysmobts.c \
 	bts_unknown.c \
 	chan_alloc.c \
 	codec_pref.c \
-	e1_config.c \
 	gsm_04_08_rr.c \
 	gsm_04_80_utils.c \
-	gsm_data.c \
-	gsm_timers.c \
 	gsm_timers_vty.c \
 	handover_cfg.c \
 	handover_decision.c \
@@ -73,7 +102,6 @@ osmo_bsc_SOURCES = \
 	mgw_endpoint_fsm.c \
 	neighbor_ident.c \
 	neighbor_ident_vty.c \
-	net_init.c \
 	gsm_08_08.c \
 	osmo_bsc_bssap.c \
 	osmo_bsc_ctrl.c \
@@ -93,7 +121,8 @@ osmo_bsc_SOURCES = \
 	$(NULL)
 
 osmo_bsc_LDADD = \
-	$(top_builddir)/src/libfilter/libfilter.a \
+	libbscbts.la \
+	$(abs_top_builddir)/src/libfilter/libfilter.a \
 	$(LIBOSMOCORE_LIBS) \
 	$(LIBOSMOGSM_LIBS) \
 	$(LIBOSMOVTY_LIBS) \

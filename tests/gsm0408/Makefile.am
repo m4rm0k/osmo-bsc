@@ -23,14 +23,12 @@ gsm0408_test_SOURCES = \
 	$(NULL)
 
 gsm0408_test_LDADD = \
-	$(top_builddir)/src/osmo-bsc/gsm_04_08_rr.o \
-	$(top_builddir)/src/osmo-bsc/arfcn_range_encode.o \
-	$(top_builddir)/src/osmo-bsc/gsm_data.o \
-	$(top_builddir)/src/osmo-bsc/gsm_timers.o \
-	$(top_builddir)/src/osmo-bsc/net_init.o \
-	$(top_builddir)/src/osmo-bsc/rest_octets.o \
-	$(top_builddir)/src/osmo-bsc/system_information.o \
-	$(top_builddir)/src/osmo-bsc/neighbor_ident.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-gsm_04_08_rr.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-arfcn_range_encode.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-rest_octets.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-system_information.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-neighbor_ident.o \
+	$(top_builddir)/src/osmo-bsc/libbscbts.la \
 	$(LIBOSMOCORE_LIBS) \
 	$(LIBOSMOGSM_LIBS) \
 	$(LIBOSMOABIS_LIBS) \

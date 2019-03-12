@@ -38,44 +38,39 @@ handover_test_LDFLAGS = \
 	$(NULL)
 
 handover_test_LDADD = \
-	$(top_builddir)/src/osmo-bsc/a_reset.o \
-	$(top_builddir)/src/osmo-bsc/abis_nm.o \
-	$(top_builddir)/src/osmo-bsc/abis_rsl.o \
-	$(top_builddir)/src/osmo-bsc/arfcn_range_encode.o \
-	$(top_builddir)/src/osmo-bsc/assignment_fsm.o \
-	$(top_builddir)/src/osmo-bsc/bsc_init.o \
-	$(top_builddir)/src/osmo-bsc/bsc_rll.o \
-	$(top_builddir)/src/osmo-bsc/bsc_subscr_conn_fsm.o \
-	$(top_builddir)/src/osmo-bsc/bsc_subscriber.o \
-	$(top_builddir)/src/osmo-bsc/bts_ipaccess_nanobts.o \
-	$(top_builddir)/src/osmo-bsc/bts_ipaccess_nanobts_omlattr.o \
-	$(top_builddir)/src/osmo-bsc/bts_sysmobts.o \
-	$(top_builddir)/src/osmo-bsc/chan_alloc.o \
-	$(top_builddir)/src/osmo-bsc/codec_pref.o \
-	$(top_builddir)/src/osmo-bsc/gsm_04_08_rr.o \
-	$(top_builddir)/src/osmo-bsc/gsm_04_80_utils.o \
-	$(top_builddir)/src/osmo-bsc/gsm_data.o \
-	$(top_builddir)/src/osmo-bsc/gsm_timers.o \
-	$(top_builddir)/src/osmo-bsc/handover_cfg.o \
-	$(top_builddir)/src/osmo-bsc/handover_decision.o \
-	$(top_builddir)/src/osmo-bsc/handover_decision_2.o \
-	$(top_builddir)/src/osmo-bsc/handover_fsm.o \
-	$(top_builddir)/src/osmo-bsc/handover_logic.o \
-	$(top_builddir)/src/osmo-bsc/lchan_fsm.o \
-	$(top_builddir)/src/osmo-bsc/lchan_rtp_fsm.o \
-	$(top_builddir)/src/osmo-bsc/lchan_select.o \
-	$(top_builddir)/src/osmo-bsc/meas_rep.o \
-	$(top_builddir)/src/osmo-bsc/mgw_endpoint_fsm.o \
-	$(top_builddir)/src/osmo-bsc/neighbor_ident.o \
-	$(top_builddir)/src/osmo-bsc/net_init.o \
-	$(top_builddir)/src/osmo-bsc/osmo_bsc_lcls.o \
-	$(top_builddir)/src/osmo-bsc/osmo_bsc_msc.o \
-	$(top_builddir)/src/osmo-bsc/paging.o \
-	$(top_builddir)/src/osmo-bsc/pcu_sock.o \
-	$(top_builddir)/src/osmo-bsc/penalty_timers.o \
-	$(top_builddir)/src/osmo-bsc/rest_octets.o \
-	$(top_builddir)/src/osmo-bsc/system_information.o \
-	$(top_builddir)/src/osmo-bsc/timeslot_fsm.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-a_reset.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-abis_rsl.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-arfcn_range_encode.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-assignment_fsm.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-bsc_init.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-bsc_rll.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-bsc_subscr_conn_fsm.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-bsc_subscriber.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-bts_sysmobts.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-chan_alloc.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-codec_pref.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-gsm_04_08_rr.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-gsm_04_80_utils.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-handover_cfg.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-handover_decision.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-handover_decision_2.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-handover_fsm.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-handover_logic.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-lchan_fsm.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-lchan_rtp_fsm.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-lchan_select.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-meas_rep.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-mgw_endpoint_fsm.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-neighbor_ident.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-osmo_bsc_lcls.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-osmo_bsc_msc.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-paging.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-pcu_sock.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-penalty_timers.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-rest_octets.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-system_information.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-timeslot_fsm.o \
+	$(top_builddir)/src/osmo-bsc/libbscbts.la \
 	$(LIBOSMOCORE_LIBS) \
 	$(LIBOSMOGSM_LIBS) \
 	$(LIBOSMOABIS_LIBS) \
@@ -88,7 +83,7 @@ neighbor_ident_test_SOURCES = \
 	$(NULL)
 
 neighbor_ident_test_LDADD = \
-	$(top_builddir)/src/osmo-bsc/neighbor_ident.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-neighbor_ident.o \
 	$(LIBOSMOCORE_LIBS) \
 	$(LIBOSMOGSM_LIBS) \
 	$(NULL)

@@ -44,14 +44,8 @@ ipaccess_config_SOURCES = \
 	stubs.c \
 	$(NULL)
 
-# FIXME: resolve the bogus dependencies patched around here:
 ipaccess_config_LDADD = \
-	$(top_builddir)/src/osmo-bsc/abis_nm.o \
-	$(top_builddir)/src/osmo-bsc/bts_ipaccess_nanobts.o \
-	$(top_builddir)/src/osmo-bsc/bts_ipaccess_nanobts_omlattr.o \
-	$(top_builddir)/src/osmo-bsc/gsm_data.o \
-	$(top_builddir)/src/osmo-bsc/gsm_timers.o \
-	$(top_builddir)/src/osmo-bsc/net_init.o \
+	$(top_builddir)/src/osmo-bsc/libbscbts.la \
 	$(OSMO_LIBS) \
 	$(NULL)
 
@@ -62,6 +56,6 @@ ipaccess_proxy_SOURCES = \
 	$(NULL)
 
 ipaccess_proxy_LDADD = \
-	$(top_builddir)/src/osmo-bsc/gsm_timers.o \
+	$(top_builddir)/src/osmo-bsc/libbscbts.la \
 	$(OSMO_LIBS) \
 	$(NULL)

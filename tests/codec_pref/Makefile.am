@@ -27,7 +27,7 @@ codec_pref_test_SOURCES = \
 	$(NULL)
 
 codec_pref_test_LDADD = \
-	$(top_builddir)/src/osmo-bsc/codec_pref.o \
+	$(top_builddir)/src/osmo-bsc/osmo_bsc-codec_pref.o \
 	$(LIBOSMOCORE_LIBS) \
 	$(LIBOSMOGSM_LIBS) \
 	-lrt \
