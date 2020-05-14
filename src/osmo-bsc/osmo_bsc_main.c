@@ -110,6 +110,7 @@ static void print_help()
 	printf("  -e --log-level number		Set a global loglevel.\n");
 	printf("  -r --rf-ctl NAME		A unix domain socket to listen for cmds.\n");
 	printf("  -t --testmode			A special mode to provoke failures at the MSC.\n");
+	printf("  -X --vty-ref-xml		Generate the VTY reference XML output and exit.\n");
 }
 
 static void handle_options(int argc, char **argv)
@@ -128,10 +129,11 @@ static void handle_options(int argc, char **argv)
 			{"log-level", 1, 0, 'e'},
 			{"rf-ctl", 1, 0, 'r'},
 			{"testmode", 0, 0, 't'},
+			{"vty-ref-xml", 0, 0, 'X'},
 			{0, 0, 0, 0}
 		};
 
-		c = getopt_long(argc, argv, "hd:DsTVc:e:r:t",
+		c = getopt_long(argc, argv, "hd:DsTVc:e:r:tX",
 				long_options, &option_index);
 		if (c == -1)
 			break;
@@ -140,6 +142,9 @@ static void handle_options(int argc, char **argv)
 		case 'h':
 			print_usage();
 			print_help();
+			exit(0);
+		case 'X':
+			vty_dump_xml_ref(stdout);
 			exit(0);
 		case 's':
 			log_set_use_color(osmo_stderr_target, 0);
