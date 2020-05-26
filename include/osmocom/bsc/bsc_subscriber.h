@@ -8,6 +8,7 @@
 #include <osmocom/gsm/protocol/gsm_23_003.h>
 
 struct log_target;
+struct osmo_mobile_identity;
 
 struct bsc_subscr {
 	struct llist_head entry;
@@ -25,11 +26,13 @@ struct bsc_subscr *bsc_subscr_find_or_create_by_imsi(struct llist_head *list,
 						     const char *imsi);
 struct bsc_subscr *bsc_subscr_find_or_create_by_tmsi(struct llist_head *list,
 						     uint32_t tmsi);
+struct bsc_subscr *bsc_subscr_find_or_create_by_mi(struct llist_head *list, const struct osmo_mobile_identity *mi);
 
 struct bsc_subscr *bsc_subscr_find_by_imsi(struct llist_head *list,
 					   const char *imsi);
 struct bsc_subscr *bsc_subscr_find_by_tmsi(struct llist_head *list,
 					   uint32_t tmsi);
+struct bsc_subscr *bsc_subscr_find_by_mi(struct llist_head *list, const struct osmo_mobile_identity *mi);
 
 void bsc_subscr_set_imsi(struct bsc_subscr *bsub, const char *imsi);
 
