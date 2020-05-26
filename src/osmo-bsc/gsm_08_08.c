@@ -33,6 +33,7 @@
 #include <osmocom/gsm/gsm0808.h>
 #include <osmocom/gsm/mncc.h>
 #include <osmocom/gsm/gsm48.h>
+#include <osmocom/gsm/gsm23236.h>
 
 #include <osmocom/bsc/osmo_bsc_sigtran.h>
 
@@ -152,6 +153,8 @@ static struct bsc_msc_data *bsc_find_msc(struct gsm_subscriber_connection *conn,
 	uint8_t round_robin_next_nr;
 	struct bsc_subscr *subscr;
 	bool is_emerg = false;
+	int16_t nri_v = -1;
+	bool is_null_nri = false;
 
 	if (msgb_l3len(msg) < sizeof(*gh)) {
 		LOGP(DRSL, LOGL_ERROR, "There is no GSM48 header here.\n");
@@ -184,7 +187,17 @@ static struct bsc_msc_data *bsc_find_msc(struct gsm_subscriber_connection *conn,
 		}
 	}
 
-	/* TODO: extract NRI from MI */
+	/* Extract NRI bits from TMSI, possibly indicating which MSC is responsible */
+	if (mi.type == GSM_MI_TYPE_TMSI) {
+		if (osmo_tmsi_nri_get(&nri_v, mi.tmsi, net->nri_bitlen)) {
+			LOGP(DMSC, LOGL_ERROR, "Unable to retrieve NRI from TMSI, nri_bitlen == %u\n", net->nri_bitlen);
+			nri_v = -1;
+		} else {
+			is_null_nri = osmo_nri_matches_list(&net->null_nri_ranges, nri_v);
+			LOGP(DMSC, LOGL_DEBUG, "TMSI 0x%08x yields NRI = 0x%x%s\n", mi.tmsi, nri_v,
+			     is_null_nri ? " = NULL-NRI" : "");
+		}
+	}
 
 	/* Iterate MSCs to find one that matches the extracted NRI, and the next round-robin target for the case no NRI
 	 * match is found. */
@@ -200,7 +213,11 @@ static struct bsc_msc_data *bsc_find_msc(struct gsm_subscriber_connection *conn,
 		    && (!msc_round_robin_next || msc->nr < msc_round_robin_next->nr))
 			msc_round_robin_next = msc;
 
-		/* TODO: return msc when extracted NRI matches this MSC */
+		if (nri_v >= 0 && !is_null_nri && osmo_nri_matches_list(&msc->nri_ranges, nri_v)) {
+			LOGP(DMSC, LOGL_DEBUG, "NRI 0x%x from TMSI 0x%08x matches msc %d\n",
+			     nri_v, mi.tmsi, msc->nr);
+			return msc;
+		}
 	}
 
 	/* No dedicated MSC found. Choose by round-robin.
@@ -212,6 +229,9 @@ static struct bsc_msc_data *bsc_find_msc(struct gsm_subscriber_connection *conn,
 			     osmo_mobile_identity_name_c(OTC_SELECT, &mi), is_emerg ? " FOR EMERGENCY CALL" : "");
 		return NULL;
 	}
+
+	LOGP(DMSC, LOGL_DEBUG, "New subscriber %s: MSC round-robin selects msc %d\n",
+	     osmo_mobile_identity_name_c(OTC_SELECT, &mi), msc_target->nr);
 
 	/* An MSC was picked by round-robin, so update the next round-robin nr to pick */
 	if (is_emerg)
