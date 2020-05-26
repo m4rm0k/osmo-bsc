@@ -228,6 +228,8 @@ struct bsc_msc_data *osmo_msc_data_alloc(struct gsm_network *net, int nr)
 	msc_data->mgcp_ipa.local_addr = talloc_strdup(msc_data, "0.0.0.0");
 	msc_data->mgcp_ipa.local_port = 0; /* dynamic */
 
+	INIT_LLIST_HEAD(&msc_data->nri_ranges);
+
 	return msc_data;
 }
 

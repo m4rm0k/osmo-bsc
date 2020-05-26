@@ -35,6 +35,7 @@
 #include <osmocom/ctrl/control_if.h>
 #include <osmocom/gsm/gsm48.h>
 #include <osmocom/gsm/gsm0808.h>
+#include <osmocom/gsm/gsm23236.h>
 
 #include <arpa/inet.h>
 
@@ -1110,6 +1111,7 @@ static int config_write_net(struct vty *vty)
 {
 	struct gsm_network *gsmnet = gsmnet_from_vty(vty);
 	int i;
+	struct osmo_nri_range *r;
 
 	vty_out(vty, "network%s", VTY_NEWLINE);
 	vty_out(vty, " network country code %s%s", osmo_mcc_name(gsmnet->plmn.mcc), VTY_NEWLINE);
@@ -1158,6 +1160,21 @@ static int config_write_net(struct vty *vty)
 
 	if (gsmnet->allow_unusable_timeslots)
 		vty_out(vty, " allow-unusable-timeslots%s", VTY_NEWLINE);
+
+	if (gsmnet->nri_bitlen != OSMO_NRI_BITLEN_DEFAULT) {
+		if (gsmnet->nri_bitlen < 1 || gsmnet->nri_bitlen > 15)
+			vty_out(vty, " %% INVALID:");
+		vty_out(vty, " nri bitlen %u%s", gsmnet->nri_bitlen, VTY_NEWLINE);
+	}
+
+	llist_for_each_entry(r, &gsmnet->null_nri_ranges, entry) {
+		if (osmo_nri_range_validate(r, 255))
+			vty_out(vty, " %% INVALID RANGE:");
+		vty_out(vty, " null-nri add %d", r->first);
+		if (r->first != r->last)
+			vty_out(vty, " %d", r->last);
+		vty_out(vty, "%s", VTY_NEWLINE);
+	}
 
 	return CMD_SUCCESS;
 }
@@ -2057,6 +2074,64 @@ DEFUN_DEPRECATED(cfg_net_dtx,
 		"configuration options of BTS instead%s", VTY_NEWLINE);
        return CMD_SUCCESS;
 }
+
+#define NRI_STR "Mapping of Network Resource Indicators to this MSC, for MSC pooling\n"
+
+DEFUN(cfg_net_nri_bitlen,
+      cfg_net_nri_bitlen_cmd,
+      "nri bitlen <1-15>",
+      NRI_STR
+      "Set number of NRI bits to extract from TMSI identities (always starting just after the most significant octet)\n"
+      "bit count (default: " OSMO_STRINGIFY_VAL(NRI_BITLEN_DEFAULT) ")\n")
+{
+	struct gsm_network *gsmnet = gsmnet_from_vty(vty);
+	gsmnet->nri_bitlen = atoi(argv[0]);
+	return CMD_SUCCESS;
+}
+
+#define NULL_NRI_STR "Define NULL-NRI values that cause re-assignment of an MS to a different MSC, for MSC pooling\n"
+#define NRI_FIRST_LAST_STR "First value of the NRI value range: either decimal ('23') or hexadecimal ('0x17')\n" \
+	"Last value of the NRI value range: either decimal ('23') or hexadecimal ('0x17');" \
+	" if omitted, apply only the first value.\n"
+#define NRI_ARGS_TO_STR_FMT "%s%s%s"
+#define NRI_ARGS_TO_STR_ARGS(ARGC, ARGV) ARGV[0], (ARGC>1)? ".." : "", (ARGC>1)? ARGV[1] : ""
+
+DEFUN(cfg_net_null_nri_add, cfg_net_null_nri_add_cmd,
+      "null-nri add FIRST [LAST]",
+      NULL_NRI_STR "Add NULL-NRI value (or range)\n"
+      NRI_FIRST_LAST_STR)
+{
+	int rc;
+	const char *message;
+	rc = osmo_nri_vty_add(&message, NULL, bsc_gsmnet, &bsc_gsmnet->null_nri_ranges, argc, argv,
+			      bsc_gsmnet->nri_bitlen);
+	if (message) {
+		vty_out(vty, "%% %s: " NRI_ARGS_TO_STR_FMT, message, NRI_ARGS_TO_STR_ARGS(argc, argv));
+	}
+	if (rc < 0)
+		return CMD_WARNING;
+	return CMD_SUCCESS;
+}
+
+DEFUN(cfg_net_null_nri_del, cfg_net_null_nri_del_cmd,
+      "null-nri del FIRST [LAST]",
+      NULL_NRI_STR "Remove NRI value or range from the NRI mapping for this MSC\n"
+      "First NRI value to del: either decimal ('23') or hexadecimal ('0x17')\n"
+      "Last NRI value to del: either decimal ('23') or hexadecimal ('0x17');"
+      " if omitted, only del the first value.\n")
+{
+	int rc;
+	const char *message;
+	rc = osmo_nri_vty_del(&message, NULL, bsc_gsmnet, &bsc_gsmnet->null_nri_ranges, argc, argv);
+	if (message) {
+		vty_out(vty, "%% %s: " NRI_ARGS_TO_STR_FMT "%s", message, NRI_ARGS_TO_STR_ARGS(argc, argv),
+			VTY_NEWLINE);
+	}
+	if (rc < 0)
+		return CMD_WARNING;
+	return CMD_SUCCESS;
+}
+
 
 /* per-BTS configuration */
 DEFUN(cfg_bts,
@@ -5400,6 +5475,9 @@ int bsc_vty_init(struct gsm_network *network)
 	install_element(GSMNET_NODE, &cfg_net_neci_cmd);
 	install_element(GSMNET_NODE, &cfg_net_dtx_cmd);
 	install_element(GSMNET_NODE, &cfg_net_pag_any_tch_cmd);
+	install_element(GSMNET_NODE, &cfg_net_nri_bitlen_cmd);
+	install_element(GSMNET_NODE, &cfg_net_null_nri_add_cmd);
+	install_element(GSMNET_NODE, &cfg_net_null_nri_del_cmd);
 
 	install_element(GSMNET_NODE, &cfg_bts_cmd);
 	install_node(&bts_node, config_write_bts);

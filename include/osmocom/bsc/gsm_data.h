@@ -1700,6 +1700,9 @@ struct gsm_network {
 
 	/* Don't refuse to start with mutually exclusive codec settings */
 	bool allow_unusable_timeslots;
+
+	uint8_t nri_bitlen;
+	struct llist_head null_nri_ranges;
 };
 
 struct gsm_audio_support {
