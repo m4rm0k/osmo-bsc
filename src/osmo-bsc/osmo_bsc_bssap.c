@@ -293,13 +293,13 @@ static int bssmap_handle_paging(struct bsc_msc_data *msc,
 				struct msgb *msg, unsigned int payload_length)
 {
 	struct tlv_parsed tp;
-	char mi_string[GSM48_MI_SIZE];
-	uint32_t tmsi = GSM_RESERVED_TMSI;
 	uint8_t data_length;
 	int remain;
 	const uint8_t *data;
 	uint8_t chan_needed = RSL_CHANNEED_ANY;
 	struct gsm0808_cell_id_list2 cil;
+	struct osmo_mobile_identity mi_imsi;
+	struct osmo_mobile_identity mi_tmsi = { .tmsi = GSM_RESERVED_TMSI };
 
 	tlv_parse(&tp, gsm0808_att_tlvdef(), msg->l4h + 1, payload_length - 1, 0, 0);
 	remain = payload_length - 1;
@@ -318,9 +318,12 @@ static int bssmap_handle_paging(struct bsc_msc_data *msc,
 		return -1;
 	}
 
-	if (TLVP_PRESENT(&tp, GSM0808_IE_TMSI) &&
-	    TLVP_LEN(&tp, GSM0808_IE_TMSI) == 4) {
-		tmsi = ntohl(tlvp_val32_unal(&tp, GSM0808_IE_TMSI));
+	if (TLVP_PRESENT(&tp, GSM0808_IE_TMSI)) {
+		if (osmo_mobile_identity_decode(&mi_tmsi, TLVP_VAL(&tp, GSM0808_IE_TMSI), TLVP_LEN(&tp, GSM0808_IE_TMSI), false)
+		    || mi_tmsi.type != GSM_MI_TYPE_TMSI) {
+			LOGP(DMSC, LOGL_ERROR, "Paging: could not parse TMSI\n");
+			return -1;
+		}
 		remain -= TLVP_LEN(&tp, GSM0808_IE_TMSI);
 	}
 
@@ -332,8 +335,11 @@ static int bssmap_handle_paging(struct bsc_msc_data *msc,
 	/*
 	 * parse the IMSI
 	 */
-	gsm48_mi_to_string(mi_string, sizeof(mi_string),
-			   TLVP_VAL(&tp, GSM0808_IE_IMSI), TLVP_LEN(&tp, GSM0808_IE_IMSI));
+	if (osmo_mobile_identity_decode(&mi_imsi, TLVP_VAL(&tp, GSM0808_IE_IMSI), TLVP_LEN(&tp, GSM0808_IE_IMSI), false)
+	    || mi_imsi.type != GSM_MI_TYPE_IMSI) {
+		LOGP(DMSC, LOGL_ERROR, "Paging: could not parse IMSI\n");
+		return -1;
+	}
 
 	/*
 	 * There are various cell identifier list types defined at 3GPP TS § 08.08, we don't support all
@@ -343,8 +349,8 @@ static int bssmap_handle_paging(struct bsc_msc_data *msc,
 	data_length = TLVP_LEN(&tp, GSM0808_IE_CELL_IDENTIFIER_LIST);
 	data = TLVP_VAL(&tp, GSM0808_IE_CELL_IDENTIFIER_LIST);
 	if (gsm0808_dec_cell_id_list2(&cil, data, data_length) < 0) {
-		LOGP(DMSC, LOGL_ERROR, "Paging IMSI %s: Could not parse Cell Identifier List\n",
-		     mi_string);
+		LOGP(DMSC, LOGL_ERROR, "Paging %s: Could not parse Cell Identifier List\n",
+		     osmo_mobile_identity_name_c(OTC_SELECT, &mi_imsi));
 		return -1;
 	}
 	remain = 0;
@@ -360,43 +366,45 @@ static int bssmap_handle_paging(struct bsc_msc_data *msc,
 
 	switch (cil.id_discr) {
 	case CELL_IDENT_NO_CELL:
-		page_all_bts(msc, tmsi, mi_string, chan_needed);
+		page_all_bts(msc, mi_tmsi.tmsi, mi_imsi.imsi, chan_needed);
 		break;
 
 	case CELL_IDENT_WHOLE_GLOBAL:
-		page_cgi(msc, &cil, tmsi, mi_string, chan_needed);
+		page_cgi(msc, &cil, mi_tmsi.tmsi, mi_imsi.imsi, chan_needed);
 		break;
 
 	case CELL_IDENT_LAC_AND_CI:
-		page_lac_and_ci(msc, &cil, tmsi, mi_string, chan_needed);
+		page_lac_and_ci(msc, &cil, mi_tmsi.tmsi, mi_imsi.imsi, chan_needed);
 		break;
 
 	case CELL_IDENT_CI:
-		page_ci(msc, &cil, tmsi, mi_string, chan_needed);
+		page_ci(msc, &cil, mi_tmsi.tmsi, mi_imsi.imsi, chan_needed);
 		break;
 
 	case CELL_IDENT_LAI_AND_LAC:
-		page_lai_and_lac(msc, &cil, tmsi, mi_string, chan_needed);
+		page_lai_and_lac(msc, &cil, mi_tmsi.tmsi, mi_imsi.imsi, chan_needed);
 		break;
 
 	case CELL_IDENT_LAC:
-		page_lac(msc, &cil, tmsi, mi_string, chan_needed);
+		page_lac(msc, &cil, mi_tmsi.tmsi, mi_imsi.imsi, chan_needed);
 		break;
 
 	case CELL_IDENT_BSS:
 		if (data_length != 1) {
-			LOGP(DMSC, LOGL_ERROR, "Paging IMSI %s: Cell Identifier List for BSS (0x%x)"
+			LOGP(DMSC, LOGL_ERROR, "Paging %s: Cell Identifier List for BSS (0x%x)"
 			     " has invalid length: %u, paging entire BSS anyway (%s)\n",
-			     mi_string, CELL_IDENT_BSS, data_length, osmo_hexdump(data, data_length));
+			     osmo_mobile_identity_name_c(OTC_SELECT, &mi_imsi),
+			     CELL_IDENT_BSS, data_length, osmo_hexdump(data, data_length));
 		}
-		page_all_bts(msc, tmsi, mi_string, chan_needed);
+		page_all_bts(msc, mi_tmsi.tmsi, mi_imsi.imsi, chan_needed);
 		break;
 
 	default:
-		LOGP(DMSC, LOGL_NOTICE, "Paging IMSI %s: unimplemented Cell Identifier List (0x%x),"
+		LOGP(DMSC, LOGL_NOTICE, "Paging %s: unimplemented Cell Identifier List (0x%x),"
 		     " paging entire BSS instead (%s)\n",
-		     mi_string, cil.id_discr, osmo_hexdump(data, data_length));
-		page_all_bts(msc, tmsi, mi_string, chan_needed);
+		     osmo_mobile_identity_name_c(OTC_SELECT, &mi_imsi),
+		     cil.id_discr, osmo_hexdump(data, data_length));
+		page_all_bts(msc, mi_tmsi.tmsi, mi_imsi.imsi, chan_needed);
 		break;
 	}
 

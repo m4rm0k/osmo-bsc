@@ -81,7 +81,7 @@ struct bsc_subscr *bsc_subscr_find_by_mi(struct llist_head *list, const struct o
 		return NULL;
 	switch (mi->type) {
 	case GSM_MI_TYPE_IMSI:
-		return bsc_subscr_find_by_imsi(list, mi->string);
+		return bsc_subscr_find_by_imsi(list, mi->imsi);
 	case GSM_MI_TYPE_TMSI:
 		return bsc_subscr_find_by_tmsi(list, mi->tmsi);
 	default:
@@ -130,7 +130,7 @@ struct bsc_subscr *bsc_subscr_find_or_create_by_mi(struct llist_head *list, cons
 		return NULL;
 	switch (mi->type) {
 	case GSM_MI_TYPE_IMSI:
-		return bsc_subscr_find_or_create_by_imsi(list, mi->string);
+		return bsc_subscr_find_or_create_by_imsi(list, mi->imsi);
 	case GSM_MI_TYPE_TMSI:
 		return bsc_subscr_find_or_create_by_tmsi(list, mi->tmsi);
 	default:
